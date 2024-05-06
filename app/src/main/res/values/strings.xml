@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Attender</string>
+    <string name="acc_creat_tit">Sign Up</string>
+    <string name="signin_act_tit">Sign In</string>
+</resources>

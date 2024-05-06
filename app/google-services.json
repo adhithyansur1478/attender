@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "842154783894",
+    "project_id": "attender-8d84a",
+    "storage_bucket": "attender-8d84a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:842154783894:android:38fdd84ad439693af0beb7",
+        "android_client_info": {
+          "package_name": "com.example.attendance"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA40mIUm06E5aoiWpKVutHtNF4p9tENJ50"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
