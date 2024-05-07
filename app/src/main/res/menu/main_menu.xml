@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+
+    <item android:id="@+id/menu_searchbttn"
+        android:title="Search"
+        android:icon="@drawable/baseline_search_24"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+
+    <item android:id="@+id/menu_addbttn"
+        android:title="ADD"
+        android:icon="@drawable/baseline_add_24"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/menu_signoutbttn"
+        android:title="SIGNOUT"
+        app:showAsAction="collapseActionView"/>
+
+
+
+
+</menu>

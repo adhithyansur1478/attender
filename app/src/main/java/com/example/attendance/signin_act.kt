@@ -69,8 +69,10 @@ class signin_act : AppCompatActivity() {
                             GlobalScope.launch {
                                 usermananger.storeloginkey(loginn)
                             }
-                            startActivity(Intent(this@signin_act,MainActivity::class.java))
-                            finishAffinity()
+                            if (loginn) {
+                                startActivity(Intent(this@signin_act, MainActivity::class.java))
+                                finishAffinity()
+                            }
                         }
                         else{
                             mprogressbar.dismiss()
