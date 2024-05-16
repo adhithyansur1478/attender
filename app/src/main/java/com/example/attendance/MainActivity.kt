@@ -18,21 +18,27 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.attendance.databinding.ActivityMainBinding
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.database
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var usermananger: UserMananger
-    private lateinit var auth: FirebaseAuth
+    lateinit var auth: FirebaseAuth
     var loginn = false
     private lateinit var binding: ActivityMainBinding
-    private lateinit var view:View
-    private lateinit var mdb:Dialog
-    lateinit var database: DatabaseReference
+    private lateinit var view: View
+    private lateinit var mdb: Dialog
+    lateinit var database: FirebaseDatabase
+    private lateinit var uid: String
+    private lateinit var dbreff: DatabaseReference
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +57,13 @@ class MainActivity : AppCompatActivity() {
         ObserveData()
 
 
+        val currentuser = auth.currentUser
+        if (currentuser != null) {
+            uid = currentuser.uid
+            Toast.makeText(this, "$uid", Toast.LENGTH_LONG).show()
+
+
+        }
 
 
 
@@ -64,22 +77,24 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main_menu,menu)
+        menuInflater.inflate(R.menu.main_menu, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         val id = item.itemId
-        if (id==R.id.menu_addbttn){
-            add_db()
+        if (id == R.id.menu_addbttn) {
+
+            val intent = Intent(this, SessDetAct::class.java)
+            startActivity(intent)
 
         }
-        if (id==R.id.menu_searchbttn){
+        if (id == R.id.menu_searchbttn) {
 
         }
 
-        if (id==R.id.menu_signoutbttn){
+        if (id == R.id.menu_signoutbttn) {
 
             auth.signOut()
             loginn = false
@@ -87,7 +102,7 @@ class MainActivity : AppCompatActivity() {
                 usermananger.storeloginkey(loginn)
             }
 
-            val intent = Intent(this,Signup_act::class.java)
+            val intent = Intent(this, Signup_act::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
 
@@ -97,9 +112,9 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    fun ObserveData(){
+    fun ObserveData() {
 
-        this.usermananger.userLoginFlow.asLiveData().observe(this){
+        this.usermananger.userLoginFlow.asLiveData().observe(this) {
             loginn = it
             checkrr()
 
@@ -113,11 +128,10 @@ class MainActivity : AppCompatActivity() {
             setContentView(view)
 
 
-
         }
         if (!loginn) {
 
-            val intent = Intent(this,Signup_act::class.java)
+            val intent = Intent(this, Signup_act::class.java)
             startActivity(intent)
             finishAffinity()
 
@@ -125,31 +139,14 @@ class MainActivity : AppCompatActivity() {
 
 
     }
-    fun add_db(){
-        mdb = Dialog(this)
-        mdb.setContentView(R.layout.db_add_session)
-        mdb.setCancelable(false)
-        mdb.setCanceledOnTouchOutside(false)
-        mdb.show()
-        mdb.findViewById<Button>(R.id.cancel_db_bttn).setOnClickListener {
-            mdb.cancel()
-        }
-
-        mdb.findViewById<Button>(R.id.sess_add_db_bttn).setOnClickListener {
-
-            val session_name = mdb.findViewById<EditText>(R.id.sessadd_txt_main_act).text.toString()
-            if (session_name.isEmpty()){
-
-                mdb.findViewById<TextInputLayout>(R.id.sessadd_TIL_main_act).error = "Enter a session name"
-            }
 
 
 
-        }
-
-
-    }
 
 
 
 }
+
+
+
+

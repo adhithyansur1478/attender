@@ -2,6 +2,7 @@
   "project_info": {
     "project_number": "842154783894",
     "project_id": "attender-8d84a",
+    "firebase_url": "https://attender-8d84a-default-rtdb.asia-southeast1.firebasedatabase.app",
     "storage_bucket": "attender-8d84a.appspot.com"
   },
   "client": [

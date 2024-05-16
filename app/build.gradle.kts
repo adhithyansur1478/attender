@@ -79,6 +79,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.2.0")
     // Live Data
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0")
+    implementation (libs.firebase.database.v1960)
+    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
 
 
 }
