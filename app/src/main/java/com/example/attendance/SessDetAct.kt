@@ -1,6 +1,7 @@
 package com.example.attendance
 
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -37,6 +38,9 @@ class SessDetAct : AppCompatActivity() {
         binding.addSessionBttn.setOnClickListener {
 
             upload(binding.sessnameTxtSessdetAct.text.toString(),binding.locaTxtSessdetAct.text.toString())
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finishAffinity()
 
         }
 
@@ -60,7 +64,7 @@ class SessDetAct : AppCompatActivity() {
 
             Toast.makeText(this, "Uploaded the file", Toast.LENGTH_LONG).show()
 
-            Toast.makeText(this, "Uploaded the file", Toast.LENGTH_LONG).show()
+
 
 
         }

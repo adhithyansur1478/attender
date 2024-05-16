@@ -26,6 +26,8 @@ class MyAdapter(private val context: Context, private val newarrayList: ArrayLis
     class MyViewHolder(itemview: View):RecyclerView.ViewHolder(itemview) {
         fun bind(user: User) {
             itemView.findViewById<TextView>(R.id.sess_name_rec).text = user.session_name
+            itemView.findViewById<TextView>(R.id.up_date_rec).text = "Updated Date: ${user.up_date}"
+            itemView.findViewById<TextView>(R.id.loc_rec).text = user.location
 
         }
 
