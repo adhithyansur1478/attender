@@ -29,6 +29,7 @@ class MyAdapter(private val context: Context, private val newarrayList: ArrayLis
             intent.putExtra("SessName", currentitem.session_name)
             intent.putExtra("Location", currentitem.location)
             intent.putExtra("Update", currentitem.up_date)
+            intent.putExtra("sessid",currentitem.sessid)
             context.startActivity(intent)
         }
 

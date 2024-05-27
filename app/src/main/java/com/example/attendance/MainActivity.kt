@@ -68,30 +68,8 @@ class MainActivity : AppCompatActivity() {
         ObserveData()
 
 
-        val currentuser = auth.currentUser
-        if (currentuser != null) {
-            uid = currentuser.uid
-            Toast.makeText(this, "$uid", Toast.LENGTH_LONG).show()
 
 
-        }
-        else{
-
-            val intent = Intent(this, Signup_act::class.java)
-            startActivity(intent)
-        }
-        database = FirebaseDatabase.getInstance().getReference("Users")
-
-
-        newarraylist = arrayListOf<User>()
-        recyclerView = binding.recyclerView
-        myAdapter = MyAdapter(view.context, newarraylist)
-
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = myAdapter
-
-        initrecycler()
-        getData()
 
 
 
@@ -153,7 +131,32 @@ class MainActivity : AppCompatActivity() {
     fun checkrr() {
         if (loginn) {
 
+            val currentuser = auth.currentUser
+            if (currentuser != null) {
+                uid = currentuser.uid
+                Toast.makeText(this, "$uid", Toast.LENGTH_LONG).show()
+
+
+            }
+            else{
+
+                val intent = Intent(this, Signup_act::class.java)
+                startActivity(intent)
+            }
+
             setContentView(view)
+            database = FirebaseDatabase.getInstance().getReference("Users")
+
+
+            newarraylist = arrayListOf<User>()
+            recyclerView = binding.recyclerView
+            myAdapter = MyAdapter(view.context, newarraylist)
+
+            recyclerView.layoutManager = LinearLayoutManager(this)
+            recyclerView.adapter = myAdapter
+
+            initrecycler()
+            getData()
 
 
         }
@@ -184,6 +187,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
     fun getData() {//gets the url of image from database
 
         database.child("$uid").child("Sessions").addValueEventListener(object : ValueEventListener {
@@ -194,8 +198,9 @@ class MainActivity : AppCompatActivity() {
                     val sess = i.child("session_name").value.toString()//Used to get the specific snapshot value of sessionName
                     val loc = i.child("location").value.toString()
                     val dat = i.child("up_date").value.toString()
+                    val sessid = i.child("sessid").value.toString()
 
-                    val up = User(session_name = sess,up_date = dat,location = loc)
+                    val up = User(session_name = sess,up_date = dat,location = loc,sessid=sessid)
                     newarraylist.add(0,up) //adding 0 to get the latest added data first in recyclerview it adds to the last of list
 
                     Log.i("egomatic", i.child("session_name").value.toString())//testing

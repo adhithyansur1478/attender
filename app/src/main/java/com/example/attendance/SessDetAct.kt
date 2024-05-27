@@ -55,11 +55,12 @@ class SessDetAct : AppCompatActivity() {
         val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
         val currentDate = sdf.format(Date())
 
-        var uploadd = User(session_name =sess, up_date =currentDate ,location = loc)
+
         database = FirebaseDatabase.getInstance()
         dbreff = database.getReference("Users")
 
         var SessionId: String? = dbreff.push().key//creates a random key
+        var uploadd = User(session_name =sess, up_date =currentDate ,location = loc, sessid = SessionId.toString())
         dbreff.child(uid).child("Sessions").child(SessionId.toString()).setValue(uploadd).addOnCompleteListener {
 
             Toast.makeText(this, "Uploaded the file", Toast.LENGTH_LONG).show()

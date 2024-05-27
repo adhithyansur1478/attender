@@ -14,6 +14,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.attendance.databinding.ActivityMain2Binding
 import com.example.attendance.databinding.ActivityMainBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -23,8 +26,12 @@ class MainActivity2 : AppCompatActivity() {
     private lateinit var binding: ActivityMain2Binding
     private lateinit var view: View
     private lateinit var dialog: AlertDialog
+    lateinit var auth: FirebaseAuth
+    lateinit var database: FirebaseDatabase
+    lateinit var uid:String
     lateinit var genderGroup:RadioGroup
     lateinit var gender:String
+    private lateinit var dbreff: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,9 +39,17 @@ class MainActivity2 : AppCompatActivity() {
         view = binding.root
         setContentView(view)
 
+        auth = FirebaseAuth.getInstance()
+
         var SessName = intent.extras!!.getString("SessName")
         var loca = intent.extras!!.getString("Location")
         var update = intent.extras!!.getString("Update")
+        var sess_id = intent.extras!!.getString("sessid").toString()
+
+        val currentuser = auth.currentUser
+        if (currentuser != null) {
+            uid = currentuser.uid
+        }
 
         binding.sessNameRecMa2.text = SessName
         binding.locRecMa2.text = loca
@@ -49,7 +64,7 @@ class MainActivity2 : AppCompatActivity() {
         binding.addBttn.setOnClickListener {
 
 
-            showdb()
+            showdb(sess_id)
 
         }
 
@@ -57,7 +72,7 @@ class MainActivity2 : AppCompatActivity() {
 
     }
 
-    fun showdb(){
+    fun showdb(sid:String){
 
         val dialogview = layoutInflater.inflate(R.layout.stud_detail_db,null)
         dialog = AlertDialog.Builder(this).setView(dialogview).show()
@@ -85,11 +100,31 @@ class MainActivity2 : AppCompatActivity() {
 
             }
 
-            Toast.makeText(this, "$mem_name, $gender", Toast.LENGTH_LONG).show()
+            upload_memdet(mem_name,gender,sid,dialog)
+        }
 
-            dialog.dismiss()
+
+    }
+
+    fun upload_memdet(nm:String,gn:String,sid:String,db:AlertDialog){
+
+        database = FirebaseDatabase.getInstance()
+        dbreff = database.getReference("Users")
+
+        var MemberId: String? = dbreff.push().key//creates a random key
+        var uploadd = Member(member_name =nm, mem_gender =gn , memid = MemberId.toString())
+        dbreff.child(uid).child("Sessions").child("Members").child(sid).child(MemberId.toString()).setValue(uploadd).addOnCompleteListener {
+
+            Toast.makeText(this, "Uploaded the file", Toast.LENGTH_LONG).show()
+            db.dismiss()
+
+
+
 
         }
+            .addOnFailureListener {
+                Toast.makeText(this, "$it", Toast.LENGTH_LONG).show()
+            }
 
 
     }
