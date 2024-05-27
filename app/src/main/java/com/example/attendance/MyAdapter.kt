@@ -1,6 +1,7 @@
 package com.example.attendance
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,17 @@ class MyAdapter(private val context: Context, private val newarrayList: ArrayLis
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         (holder as MyViewHolder).bind(newarrayList[position])
+
+        val currentitem = newarrayList[position]
+
+        holder.itemView.setOnClickListener {
+            val intent = Intent(context, MainActivity2::class.java)
+            intent.putExtra("SessName", currentitem.session_name)
+            intent.putExtra("Location", currentitem.location)
+            intent.putExtra("Update", currentitem.up_date)
+            context.startActivity(intent)
+        }
+
     }
 
 
