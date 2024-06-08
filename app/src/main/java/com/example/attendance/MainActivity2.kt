@@ -1,5 +1,6 @@
 package com.example.attendance
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -26,6 +27,8 @@ import com.google.firebase.database.ValueEventListener
 import java.text.SimpleDateFormat
 import java.util.Date
 
+private lateinit var sess_id: String
+var uid:String = ""
 class MainActivity2 : AppCompatActivity() {
 
 
@@ -34,7 +37,7 @@ class MainActivity2 : AppCompatActivity() {
     private lateinit var dialog: AlertDialog
     lateinit var auth: FirebaseAuth
     lateinit var database: FirebaseDatabase
-    lateinit var uid:String
+
     lateinit var gender:String
     private lateinit var dbreff: DatabaseReference
     private lateinit var recyclerView: RecyclerView
@@ -49,15 +52,24 @@ class MainActivity2 : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
+
         var SessName = intent.extras!!.getString("SessName")
         var loca = intent.extras!!.getString("Location")
         var update = intent.extras!!.getString("Update")
-        var sess_id = intent.extras!!.getString("sessid").toString()
+        sess_id = intent.extras!!.getString("sessid").toString()
+
 
         val currentuser = auth.currentUser
+
         if (currentuser != null) {
             uid = currentuser.uid
         }
+            Toast.makeText(this, "$uid", Toast.LENGTH_LONG).show()
+
+
+
+
+
 
         dbreff = FirebaseDatabase.getInstance().getReference("Users")
 
@@ -89,7 +101,10 @@ class MainActivity2 : AppCompatActivity() {
 
 
 
+
     }
+
+
 
     fun showdb(sid:String){
 
@@ -131,7 +146,7 @@ class MainActivity2 : AppCompatActivity() {
         dbreff = database.getReference("Users")
 
         var MemberId: String? = dbreff.push().key//creates a random key
-        var uploadd = Member(member_name =nm, mem_gender =gn , memid = MemberId.toString())
+        var uploadd = Member(member_name =nm, mem_gender =gn , memid = MemberId.toString(),mem_chbx = false)
         dbreff.child(uid).child("Members").child(sid).child(MemberId.toString()).setValue(uploadd).addOnCompleteListener {
 
             Toast.makeText(this, "Uploaded the file", Toast.LENGTH_LONG).show()
@@ -166,27 +181,37 @@ class MainActivity2 : AppCompatActivity() {
 
     fun getData(session_id:String) {//gets the url of image from database
 
+
         dbreff.child("$uid").child("Members").child(session_id).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) { //updates the array list after change in database
+                newarraylist.clear()
                 //Log.i("egomatic", snapshot.children.toString())
                 for (i in snapshot.children) {
 
                     val mem_name = i.child("member_name").value.toString()//Used to get the specific snapshot value of sessionName
                     val mem_gender = i.child("mem_gender").value.toString()
                     val mem_id = i.child("memid").value.toString()
+                    val mem_chbx = i.child("mem_chbx").value.toString().toBoolean()
 
-                    val up = Member(member_name = mem_name, mem_gender = mem_gender,memid = mem_id)
+                    val up = Member(member_name = mem_name, mem_gender = mem_gender,memid = mem_id,mem_chbx=mem_chbx )
                     newarraylist.add(0,up) //adding 0 to get the latest added data first in recyclerview it adds to the last of list
 
-                    Log.i("egomatic", i.child("session_name").value.toString())//testing
+
+                    Log.i("egomaticc", i.child("mem_chbx").value.toString())//testing
                     Log.i("egomatic", i.child("location").value.toString())
                     Log.i("egomatic", i.child("up_date").value.toString())
 
                 }
 
+                val mem_count = newarraylist.size.toString()
+                binding.membercountTv.text = "Total Number Of Members: $mem_count"
+
                 try {
                     myAdapter = MyAdapter2(this@MainActivity2, newarraylist)
                     recyclerView.adapter = myAdapter
+                    myAdapter.notifyDataSetChanged()
+                    initrecycler()
+
                 }
                 catch (e:Exception){
                     Log.i("exc","$e")
@@ -195,10 +220,38 @@ class MainActivity2 : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+                Toast.makeText(this@MainActivity2, error.toString(), Toast.LENGTH_LONG).show()
             }
         })
     }
+
+    fun setchkbox(MemberId:String?,value:Boolean,cont:Context) {
+
+        database = FirebaseDatabase.getInstance()
+        dbreff = database.getReference("Users")
+
+        dbreff.child(uid).child("Members").child(sess_id).child(MemberId.toString()).child("mem_chbx").setValue(value).addOnCompleteListener {
+
+            Toast.makeText(cont, "$uid huhu", Toast.LENGTH_LONG).show()
+            Log.i("haha","$uid")
+            Log.i("hahaha","$sess_id")
+
+
+
+
+
+
+
+
+
+        }
+            .addOnFailureListener {
+                Toast.makeText(cont, "$it", Toast.LENGTH_LONG).show()
+            }
+
+    }
+
+
 
 
 }

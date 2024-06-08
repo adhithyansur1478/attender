@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var view: View
     private lateinit var mdb: Dialog
     lateinit var database: DatabaseReference
-    private lateinit var uid: String
+    public lateinit var uid:String
     private lateinit var dbreff: DatabaseReference
     private lateinit var recyclerView: RecyclerView
     private lateinit var newarraylist: ArrayList<User>
@@ -66,6 +66,7 @@ class MainActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
 
         ObserveData()
+
 
 
 
@@ -190,6 +191,7 @@ class MainActivity : AppCompatActivity() {
 
     fun getData() {//gets the url of image from database
 
+
         database.child("$uid").child("Sessions").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) { //updates the array list after change in database
                 //Log.i("egomatic", snapshot.children.toString())
@@ -220,7 +222,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+                Toast.makeText(this@MainActivity, error.toString(), Toast.LENGTH_LONG).show()
             }
         })
     }

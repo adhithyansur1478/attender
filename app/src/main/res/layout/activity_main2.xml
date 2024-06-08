@@ -114,17 +114,17 @@
         android:text="Add Member"
         android:textColor="#7E040404"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/edit_bttn"
+        app:layout_constraintEnd_toStartOf="@+id/upload_bttn"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/edit_bttn"
+        android:id="@+id/upload_bttn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/sign_up_bttn"
-        android:drawableTop="@drawable/baseline_edit_24"
+        android:drawableTop="@drawable/baseline_arrow_circle_up_24"
         android:padding="5dp"
-        android:text="Edit"
+        android:text="Upload"
         android:textColor="#7E040404"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/dlt_bttn"
@@ -141,14 +141,14 @@
         android:text="Delete"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/edit_bttn" />
+        app:layout_constraintStart_toEndOf="@+id/upload_bttn" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_ma2"
-        android:layout_width="358dp"
-        android:layout_height="398dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_marginStart="1dp"
-        android:layout_marginTop="3dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="1dp"
         android:layout_marginBottom="3dp"
         app:layout_constraintBottom_toTopOf="@+id/add_bttn"
