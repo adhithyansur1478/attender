@@ -33,7 +33,7 @@ class MyAdapter2(private val context: Context, private val newarrayList: ArrayLi
         cbx.setOnCheckedChangeListener(null)
 
         // Set the current state of the checkbox
-        cbx.isChecked = currentitem.mem_chbx
+        cbx.isChecked = currentitem.mem_chbx ///evdeeeeeeeee date vech nokknm condition koduthh
 
         // Disable the checkbox if it's already checked
         cbx.isEnabled = !currentitem.mem_chbx

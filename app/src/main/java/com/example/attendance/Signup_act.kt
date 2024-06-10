@@ -2,6 +2,7 @@ package com.example.attendance
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -100,6 +101,7 @@ class Signup_act : AppCompatActivity() {
                                 baseContext, "Authentication failed.${task.exception}",
                                 Toast.LENGTH_SHORT
                             ).show()
+                            Log.i("hya",task.exception.toString())
                         }
                     }
             }

@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.attendance.databinding.ActivityMain2Binding
@@ -24,6 +25,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -36,8 +39,9 @@ class MainActivity2 : AppCompatActivity() {
     private lateinit var view: View
     private lateinit var dialog: AlertDialog
     lateinit var auth: FirebaseAuth
+    private lateinit var update:String
     lateinit var database: FirebaseDatabase
-
+    lateinit var currentDate:String
     lateinit var gender:String
     private lateinit var dbreff: DatabaseReference
     private lateinit var recyclerView: RecyclerView
@@ -50,12 +54,15 @@ class MainActivity2 : AppCompatActivity() {
         view = binding.root
         setContentView(view)
 
+
+
         auth = FirebaseAuth.getInstance()
+        update = ""
 
 
         var SessName = intent.extras!!.getString("SessName")
         var loca = intent.extras!!.getString("Location")
-        var update = intent.extras!!.getString("Update")
+        //update = intent.extras!!.getString("Update")
         sess_id = intent.extras!!.getString("sessid").toString()
 
 
@@ -73,14 +80,22 @@ class MainActivity2 : AppCompatActivity() {
 
         dbreff = FirebaseDatabase.getInstance().getReference("Users")
 
+
         binding.sessNameRecMa2.text = SessName
         binding.locRecMa2.text = loca
-        binding.upDateRecMa2.text = "${binding.upDateRecMa2.text} $update"
 
-        val sdf = SimpleDateFormat("dd/M/yyyy ")
-        val currentDate = sdf.format(Date())
+
+
+
+
+
+        val sdf = SimpleDateFormat("dd/M/yyyy")
+        currentDate = sdf.format(Date())
 
         binding.dateTv.text = "${binding.dateTv.text} $currentDate"
+
+
+
 
         newarraylist = arrayListOf<Member>()
         recyclerView = binding.recyclerViewMa2
@@ -90,6 +105,7 @@ class MainActivity2 : AppCompatActivity() {
         recyclerView.adapter = myAdapter
         initrecycler()
         getData(sess_id)
+
 
 
         binding.addBttn.setOnClickListener {
@@ -146,11 +162,16 @@ class MainActivity2 : AppCompatActivity() {
         dbreff = database.getReference("Users")
 
         var MemberId: String? = dbreff.push().key//creates a random key
-        var uploadd = Member(member_name =nm, mem_gender =gn , memid = MemberId.toString(),mem_chbx = false)
+        var uploadd = Member(member_name =nm, mem_gender =gn , memid = MemberId.toString(),mem_chbx = false,up_date = currentDate)
         dbreff.child(uid).child("Members").child(sid).child(MemberId.toString()).setValue(uploadd).addOnCompleteListener {
+
+
+            
+
 
             Toast.makeText(this, "Uploaded the file", Toast.LENGTH_LONG).show()
             db.dismiss()
+
 
 
 
@@ -182,6 +203,7 @@ class MainActivity2 : AppCompatActivity() {
     fun getData(session_id:String) {//gets the url of image from database
 
 
+
         dbreff.child("$uid").child("Members").child(session_id).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) { //updates the array list after change in database
                 newarraylist.clear()
@@ -192,16 +214,56 @@ class MainActivity2 : AppCompatActivity() {
                     val mem_gender = i.child("mem_gender").value.toString()
                     val mem_id = i.child("memid").value.toString()
                     val mem_chbx = i.child("mem_chbx").value.toString().toBoolean()
+                    update = i.child("up_date").value.toString()
 
-                    val up = Member(member_name = mem_name, mem_gender = mem_gender,memid = mem_id,mem_chbx=mem_chbx )
+
+                    val up = Member(member_name = mem_name, mem_gender = mem_gender,memid = mem_id,mem_chbx=mem_chbx,up_date = update )
                     newarraylist.add(0,up) //adding 0 to get the latest added data first in recyclerview it adds to the last of list
 
 
                     Log.i("egomaticc", i.child("mem_chbx").value.toString())//testing
                     Log.i("egomatic", i.child("location").value.toString())
-                    Log.i("egomatic", i.child("up_date").value.toString())
+                    Log.i("hui", i.child("up_date").value.toString())
 
                 }
+
+                if (newarraylist.isNotEmpty()) {
+                    var i = 1
+
+                    var dt = 0
+                    var grt = newarraylist[0].up_date.toString().substringBefore("/").toInt()
+                    //Log.i("jik",newarraylist[0].up_date.toString())
+                    while (i < newarraylist.size) {
+
+                        if (newarraylist[i].up_date.toString().substringBefore("/").toInt() > grt) {
+                            grt = newarraylist[i].up_date.toString().substringBefore("/").toInt()
+                            dt = i
+
+
+                        }
+                        i++
+                    }
+
+
+
+                    Log.i("jlkkkkk", newarraylist[dt].up_date.toString())
+                    update = newarraylist[dt].up_date.toString()
+                    binding.upDateRecMa2.text = "Updated Date: $update"
+
+                }
+                val sdf = SimpleDateFormat("dd/M/yyyy")
+                var curtDate = sdf.format(Date())
+
+                if(update.substringAfter("/")!=curtDate.substringAfter("/")){
+
+
+                    updateAgeForAllPeople(false)
+                    Log.i("jlk",update.substringAfter("/").toString())
+                    Log.i("jlkk","${curtDate} ${curtDate.substringAfter("/").toString()}")
+
+                }
+
+
 
                 val mem_count = newarraylist.size.toString()
                 binding.membercountTv.text = "Total Number Of Members: $mem_count"
@@ -217,41 +279,93 @@ class MainActivity2 : AppCompatActivity() {
                     Log.i("exc","$e")
                 }
 
+
+
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(this@MainActivity2, error.toString(), Toast.LENGTH_LONG).show()
             }
         })
+
+
+
     }
 
     fun setchkbox(MemberId:String?,value:Boolean,cont:Context) {
 
+        val sdf = SimpleDateFormat("dd/M/yyyy")
+        var curtDate = sdf.format(Date())
+
         database = FirebaseDatabase.getInstance()
         dbreff = database.getReference("Users")
 
-        dbreff.child(uid).child("Members").child(sess_id).child(MemberId.toString()).child("mem_chbx").setValue(value).addOnCompleteListener {
-
-            Toast.makeText(cont, "$uid huhu", Toast.LENGTH_LONG).show()
-            Log.i("haha","$uid")
-            Log.i("hahaha","$sess_id")
 
 
+        dbreff.child(uid).child("Members").child(sess_id).child(MemberId.toString())
+            .child("mem_chbx").setValue(value).addOnCompleteListener {
+
+            dbreff.child(uid).child("Members").child(sess_id).child(MemberId.toString())
+                .child("up_date").setValue(curtDate).addOnCompleteListener {
+                //Toast.makeText(cont, "$uid huhu", Toast.LENGTH_LONG).show()
+                Log.i("haha", "$uid")
+                Log.i("hahaha", "$sess_id")
 
 
+            }
+                .addOnFailureListener {
+                    Toast.makeText(cont, "$it", Toast.LENGTH_LONG).show()
+                }
 
-
-
-
-
-        }
-            .addOnFailureListener {
+        }.addOnFailureListener {
                 Toast.makeText(cont, "$it", Toast.LENGTH_LONG).show()
             }
 
+
     }
 
+    fun updateAgeForAllPeople(newval: Boolean) {
 
+        val sdf = SimpleDateFormat("dd/M/yyyy")
+        var curtDate = sdf.format(Date())
+        // Get the reference to the "people" node
+        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val peopleRef: DatabaseReference = database.getReference("Users")
 
+        // Read the data of the "people" node
+        peopleRef.child(uid).child("Members").child(sess_id).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Iterate over each child node
+                for (childSnapshot in dataSnapshot.children) {
+                    // Get the key of the child node
+                    val childKey = childSnapshot.key
+                    Log.i("kyy",childKey.toString())
+                    // Check if the child node exists
+                    if (childKey != null) {
+                        // Set the age to the new value (18)
+                        val childUpdateMap = mapOf("mem_chbx" to newval)
+                        val childUpdateMapp = mapOf("up_date" to curtDate)
+                        peopleRef.child(uid).child("Members").child(sess_id).child(childKey).updateChildren(childUpdateMap).addOnCompleteListener { task ->
+                            Log.i("huhu","woooh")
+                            if (task.isSuccessful) {
+                                peopleRef.child(uid).child("Members").child(sess_id).child(childKey).updateChildren(childUpdateMapp).addOnCompleteListener { task ->
+                                    println("Age updated successfully for person: $childKey")
+
+                                }
+                            } else {
+                                // Handle the error
+                                println("Failed to update age for person: $childKey")
+                            }
+                        }
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Handle database error
+                println("Database error: ${databaseError.message}")
+            }
+        })
+    }
 
 }

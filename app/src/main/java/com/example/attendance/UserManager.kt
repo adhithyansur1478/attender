@@ -15,6 +15,7 @@ class UserMananger(context: Context) {
     // Create some keys we will use them to store and retrieve the data
     companion object {
         val USER_LOGIN_KEY = preferencesKey<Boolean>("USER_LOGIN_KEY")
+       
 
 
     }
@@ -31,11 +32,14 @@ class UserMananger(context: Context) {
         }
     }
 
+
+
     // Create an age flow to retrieve age from the preferences
     // flow comes from the kotlin coroutine
     val userLoginFlow: Flow<Boolean> = dataStore.data.map {
         it[USER_LOGIN_KEY] ?: false
     }
+
 
 
 
