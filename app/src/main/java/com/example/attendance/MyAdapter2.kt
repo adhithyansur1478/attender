@@ -79,6 +79,7 @@ class MyAdapter2(private val context: Context, private val newarrayList: ArrayLi
 
             MainActivity2().sketchbox2(currentitem.memid,1,context)
             currentitem.pres = 1
+            ryes.isChecked = true
             notifyDataSetChanged()
 
         }
@@ -87,6 +88,7 @@ class MyAdapter2(private val context: Context, private val newarrayList: ArrayLi
 
             MainActivity2().sketchbox2(currentitem.memid,2,context)
             currentitem.pres = 2
+            rno.isChecked = true
             notifyDataSetChanged()
         }
 

@@ -264,6 +264,12 @@ class MainActivity2 : AppCompatActivity() {
 
                 }
 
+                if (update!=curtDate){
+
+                    updateAgeForAllPeople2(0)
+
+                }
+
 
 
                 val mem_count = newarraylist.size.toString()
@@ -373,13 +379,15 @@ class MainActivity2 : AppCompatActivity() {
                     Log.i("kyy",childKey.toString())
                     // Check if the child node exists
                     if (childKey != null) {
-                        // Set the age to the new value (18)
+                        //Set the age to the new value (18)
                         val childUpdateMap = mapOf("mem_chbx" to newval)
                         val childUpdateMapp = mapOf("up_date" to curtDate)
                         peopleRef.child(uid).child("Members").child(sess_id).child(childKey).updateChildren(childUpdateMap).addOnCompleteListener { task ->
-                            Log.i("huhu","woooh")
+                            Log.i("huhu", "woooh")
                             if (task.isSuccessful) {
-                                peopleRef.child(uid).child("Members").child(sess_id).child(childKey).updateChildren(childUpdateMapp).addOnCompleteListener { task ->
+                                println("Age updated successfully for person: $childKey")
+                                peopleRef.child(uid).child("Members").child(sess_id).child(childKey)
+                                    .updateChildren(childUpdateMapp).addOnCompleteListener { task ->
                                     println("Age updated successfully for person: $childKey")
 
                                 }
@@ -393,10 +401,60 @@ class MainActivity2 : AppCompatActivity() {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
+            // Handle database error
+            println("Database error: ${databaseError.message}")
+        }
+        })
+    }
+
+
+    fun updateAgeForAllPeople2(newval:Int){
+
+        val sdf = SimpleDateFormat("dd/M/yyyy")
+        var curtDate = sdf.format(Date())
+        // Get the reference to the "people" node
+        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val peopleRef: DatabaseReference = database.getReference("Users")
+
+        // Read the data of the "people" node
+        peopleRef.child(uid).child("Members").child(sess_id).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Iterate over each child node
+                for (childSnapshot in dataSnapshot.children) {
+                    // Get the key of the child node
+                    val childKey = childSnapshot.key
+                    Log.i("kyy",childKey.toString())
+                    // Check if the child node exists
+                    if (childKey != null) {
+                        // Set the age to the new value (18)
+                        val childUpdateMap = mapOf("pres" to newval)
+                        val childUpdateMapp = mapOf("up_date" to curtDate)
+                        peopleRef.child(uid).child("Members").child(sess_id).child(childKey).updateChildren(childUpdateMap).addOnCompleteListener { task ->
+                            Log.i("huhu", "woooh")
+                            if (task.isSuccessful) {
+                                println("Age updated successfully for person: $childKey")
+                                peopleRef.child(uid).child("Members").child(sess_id).child(childKey)
+                                    .updateChildren(childUpdateMapp).addOnCompleteListener { task ->
+                                    println("Age updated successfully for person: $childKey")
+
+                                }
+                            } else {
+                                // Handle the error
+                                println("Failed to update age for person: $childKey")
+                            }
+                        }
+                        }
+
+                    }
+                }
+
+
+            override fun onCancelled(databaseError: DatabaseError) {
                 // Handle database error
                 println("Database error: ${databaseError.message}")
             }
         })
+
     }
 
 }
