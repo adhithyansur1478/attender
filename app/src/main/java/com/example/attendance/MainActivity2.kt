@@ -162,7 +162,7 @@ class MainActivity2 : AppCompatActivity() {
         dbreff = database.getReference("Users")
 
         var MemberId: String? = dbreff.push().key//creates a random key
-        var uploadd = Member(member_name =nm, mem_gender =gn , memid = MemberId.toString(),mem_chbx = false,up_date = currentDate)
+        var uploadd = Member(member_name =nm, mem_gender =gn , memid = MemberId.toString(),mem_chbx = false,up_date = currentDate, pres = 0)
         dbreff.child(uid).child("Members").child(sid).child(MemberId.toString()).setValue(uploadd).addOnCompleteListener {
 
 
@@ -215,9 +215,10 @@ class MainActivity2 : AppCompatActivity() {
                     val mem_id = i.child("memid").value.toString()
                     val mem_chbx = i.child("mem_chbx").value.toString().toBoolean()
                     update = i.child("up_date").value.toString()
+                    val pres  = i.child("pres").value.toString().toInt()
 
 
-                    val up = Member(member_name = mem_name, mem_gender = mem_gender,memid = mem_id,mem_chbx=mem_chbx,up_date = update )
+                    val up = Member(member_name = mem_name, mem_gender = mem_gender,memid = mem_id,mem_chbx=mem_chbx,up_date = update, pres = pres )
                     newarraylist.add(0,up) //adding 0 to get the latest added data first in recyclerview it adds to the last of list
 
 
@@ -290,6 +291,36 @@ class MainActivity2 : AppCompatActivity() {
 
 
 
+    }
+
+    fun sketchbox2(MemberId: String?,value:Int,cont: Context){
+
+        val sdf = SimpleDateFormat("dd/M/yyyy")
+        var curtDate = sdf.format(Date())
+
+        database = FirebaseDatabase.getInstance()
+        dbreff = database.getReference("Users")
+
+
+
+        dbreff.child(uid).child("Members").child(sess_id).child(MemberId.toString())
+            .child("pres").setValue(value).addOnCompleteListener {
+
+                dbreff.child(uid).child("Members").child(sess_id).child(MemberId.toString())
+                    .child("up_date").setValue(curtDate).addOnCompleteListener {
+                        //Toast.makeText(cont, "$uid huhu", Toast.LENGTH_LONG).show()
+                        Log.i("haha", "$uid")
+                        Log.i("hahaha", "$sess_id")
+
+
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(cont, "$it", Toast.LENGTH_LONG).show()
+                    }
+
+            }.addOnFailureListener {
+                Toast.makeText(cont, "$it", Toast.LENGTH_LONG).show()
+            }
     }
 
     fun setchkbox(MemberId:String?,value:Boolean,cont:Context) {

@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
@@ -28,6 +30,65 @@ class MyAdapter2(private val context: Context, private val newarrayList: ArrayLi
 
         val currentitem = newarrayList[position]
         val cbx = holder.itemView.findViewById<CheckBox>(R.id.checkBox)
+        val rgrp = holder.itemView.findViewById<RadioGroup>(R.id.radioGroup)
+        var ryes = holder.itemView.findViewById<RadioButton>(R.id.rb_yes)
+        var rno = holder.itemView.findViewById<RadioButton>(R.id.rb_no)
+
+        rgrp.setOnCheckedChangeListener(null)
+        ryes.setOnCheckedChangeListener(null)
+        rno.setOnCheckedChangeListener(null)
+
+        holder.itemView.findViewById<RadioGroup>(R.id.radioGroup).setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.rb_yes -> {
+                    if (currentitem.pres==1){
+                        ryes.isChecked = true
+                    }
+                    if (currentitem.pres==2){
+                        ryes.isChecked = false
+                    }
+                }
+                R.id.rb_no -> {
+                    if (currentitem.pres==1){
+                        rno.isChecked = false
+                    }
+                    if (currentitem.pres==2){
+                        rno.isChecked = true
+                    }
+                }
+            }
+        }
+
+
+        when (currentitem.pres) {
+            1 -> {
+                ryes.isChecked = true
+                rno.isChecked = false
+            }
+            2 -> {
+                rno.isChecked = true
+                ryes.isChecked = false
+            }
+            else -> {
+                ryes.isChecked = false
+                rno.isChecked = false
+            }
+        }
+
+        ryes.setOnClickListener {
+
+            MainActivity2().sketchbox2(currentitem.memid,1,context)
+            currentitem.pres = 1
+            notifyDataSetChanged()
+
+        }
+
+        rno.setOnClickListener {
+
+            MainActivity2().sketchbox2(currentitem.memid,2,context)
+            currentitem.pres = 2
+            notifyDataSetChanged()
+        }
 
         // Avoid triggering the listener when recycling views
         cbx.setOnCheckedChangeListener(null)
@@ -83,6 +144,24 @@ class MyAdapter2(private val context: Context, private val newarrayList: ArrayLi
             itemView.findViewById<TextView>(R.id.mem_gender).text = "Gender: ${member.mem_gender}"
             itemView.findViewById<CheckBox>(R.id.checkBox).isChecked = member.mem_chbx
             itemView.findViewById<CheckBox>(R.id.checkBox).isEnabled = !member.mem_chbx
+            var radioButtonYes = itemView.findViewById<RadioButton>(R.id.rb_yes)
+            var radioButtonNo = itemView.findViewById<RadioButton>(R.id.rb_no)
+
+            when (member.pres) {
+                1 -> {
+                    radioButtonYes.isChecked = true
+                    radioButtonNo.isChecked = false
+                }
+                2 -> {
+                    radioButtonNo.isChecked = true
+                    radioButtonYes.isChecked = false
+                }
+                else -> {
+                    radioButtonYes.isChecked = false
+                    radioButtonNo.isChecked = false
+                }
+            }
+
         }
     }
 }
