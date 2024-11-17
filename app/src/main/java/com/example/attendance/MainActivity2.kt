@@ -1,5 +1,6 @@
 package com.example.attendance
 
+import android.app.Dialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.os.Environment
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
@@ -43,7 +45,10 @@ import java.util.Date
 private lateinit var sess_id: String
 var uid:String = ""
 private lateinit var sess_name:String
+private lateinit var mprogressbar: Dialog
 class MainActivity2 : AppCompatActivity() {
+
+
 
     companion object {
         private const val CAMERA_PERMISSION_CODE = 100
@@ -87,6 +92,8 @@ class MainActivity2 : AppCompatActivity() {
         update = ""
 
 
+
+
         var SessName = intent.extras!!.getString("SessName")
         var loca = intent.extras!!.getString("Location")
         //update = intent.extras!!.getString("Update")
@@ -111,6 +118,7 @@ class MainActivity2 : AppCompatActivity() {
 
         binding.sessNameRecMa2.text = SessName
         binding.locRecMa2.text = loca
+
 
 
 
@@ -501,9 +509,12 @@ class MainActivity2 : AppCompatActivity() {
     fun upload_bttn(){
 
 
+        progressbar()
+
         val emptlst = mutableListOf<List<String>>()
 
         for (i in newarraylist){
+            mprogressbar.show()
 
 
             Log.i("jio",i.toString())
@@ -517,14 +528,20 @@ class MainActivity2 : AppCompatActivity() {
             }
 
 
-
-
         }
 
         emptlst.toList()//To make the list work in the down forloop
         Log.i("jwn",emptlst.toString())
 
-        ExcelUtils(this).writeDataToExcel(currentDate,emptlst, "$sess_name")
+        ExcelUtils(this).writeDataToExcel(currentDate,emptlst, "$sess_name",mprogressbar)
+    }
+
+    fun progressbar(){
+        mprogressbar = Dialog(this)
+        mprogressbar.setContentView(R.layout.progressbar)
+        mprogressbar.setCancelable(false)
+        mprogressbar.setCanceledOnTouchOutside(false)
+
     }
 
 
