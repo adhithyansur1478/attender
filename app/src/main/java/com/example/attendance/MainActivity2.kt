@@ -1,7 +1,9 @@
 package com.example.attendance
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -12,6 +14,8 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.asLiveData
@@ -27,12 +31,23 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 
 private lateinit var sess_id: String
 var uid:String = ""
 class MainActivity2 : AppCompatActivity() {
+
+    companion object {
+        private const val CAMERA_PERMISSION_CODE = 100
+        private const val STORAGE_PERMISSION_CODE = 101
+    }
 
 
     private lateinit var binding: ActivityMain2Binding
@@ -47,12 +62,23 @@ class MainActivity2 : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var newarraylist: ArrayList<Member>
     private lateinit var myAdapter: MyAdapter2
+    private val REQUEST_CODE_PERMISSION = 1001
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        System.setProperty("org.apache.poi.javax.xml.stream.XMLInputFactory", "com.fasterxml.aalto.stax.InputFactoryImpl")
+        System.setProperty("org.apache.poi.javax.xml.stream.XMLOutputFactory", "com.fasterxml.aalto.stax.OutputFactoryImpl")
+        System.setProperty("org.apache.poi.javax.xml.stream.XMLEventFactory", "com.fasterxml.aalto.stax.EventFactoryImpl")
+
         binding = ActivityMain2Binding.inflate(layoutInflater)
         view = binding.root
         setContentView(view)
+
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_CODE_PERMISSION)
+        }
 
 
 
@@ -112,6 +138,17 @@ class MainActivity2 : AppCompatActivity() {
 
 
             showdb(sess_id)
+
+        }
+
+
+        binding.uploadBttn.setOnClickListener {
+
+
+
+
+
+            upload_bttn()
 
         }
 
@@ -222,11 +259,13 @@ class MainActivity2 : AppCompatActivity() {
                     newarraylist.add(0,up) //adding 0 to get the latest added data first in recyclerview it adds to the last of list
 
 
+
                     Log.i("egomaticc", i.child("mem_chbx").value.toString())//testing
                     Log.i("egomatic", i.child("location").value.toString())
                     Log.i("hui", i.child("up_date").value.toString())
 
                 }
+                Log.i("hkk", newarraylist[0].member_name.toString())//testing
 
                 if (newarraylist.isNotEmpty()) {
                     var i = 1
@@ -456,5 +495,85 @@ class MainActivity2 : AppCompatActivity() {
         })
 
     }
+
+    fun upload_bttn(){
+
+
+        try {
+            // Create a Workbook
+            val workbook = XSSFWorkbook()
+
+            // Create a Sheet
+            val sheet = workbook.createSheet("Attend3")
+
+            // Create Header Row
+            val headerRow: Row = sheet.createRow(0)
+            val headers = listOf("Name", "Attendance")
+            for ((index, header) in headers.withIndex()) {
+                val cell: Cell = headerRow.createCell(index)
+                cell.setCellValue(header)
+            }
+
+
+
+            val emptlst = mutableListOf<List<String>>()
+
+            for (i in newarraylist){
+
+
+                Log.i("jio",i.toString())
+                if (i.pres==1){
+
+                    emptlst.add(listOf<String>(i.member_name.toString(),"Present"))
+
+                }
+                else{
+                    emptlst.add(listOf<String>(i.member_name.toString(),"Absent"))
+                }
+
+
+
+
+            }
+
+            emptlst.toList()//To make the list work in the down forloop
+            Log.i("jwn",emptlst.toString())
+
+
+
+
+            for ((rowIndex, rowData) in emptlst.withIndex()) {
+                val row: Row = sheet.createRow(rowIndex + 1)
+                for ((cellIndex, cellData) in rowData.withIndex()) {
+                    val cell: Cell = row.createCell(cellIndex)
+                    cell.setCellValue(cellData)
+                }
+            }
+
+            // Create a File in External Storage
+            val fileName = "Attendance.xlsx"
+            val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
+
+            // Write the Workbook to File
+            val fileOutputStream = FileOutputStream(file)
+            workbook.write(fileOutputStream)
+
+            // Close Streams
+            fileOutputStream.close()
+            workbook.close()
+
+            println("Excel file created successfully at: ${file.absolutePath}")
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            println("Error creating Excel file: ${e.message}")
+        }
+    }
+
+
+
+
+
+
 
 }

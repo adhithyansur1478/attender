@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.attendance"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -38,6 +38,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+
     }
     kotlinOptions {
         jvmTarget = "1.8"
@@ -82,5 +83,15 @@ dependencies {
     implementation (libs.firebase.database.v1960)
     implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
 
+    implementation ("org.apache.poi:poi:5.2.3")
+    implementation ("org.apache.poi:poi-ooxml:5.2.3")
+
+
+
+
+
+
+
 
 }
+
