@@ -42,6 +42,7 @@ import java.util.Date
 
 private lateinit var sess_id: String
 var uid:String = ""
+private lateinit var sess_name:String
 class MainActivity2 : AppCompatActivity() {
 
     companion object {
@@ -90,6 +91,7 @@ class MainActivity2 : AppCompatActivity() {
         var loca = intent.extras!!.getString("Location")
         //update = intent.extras!!.getString("Update")
         sess_id = intent.extras!!.getString("sessid").toString()
+        sess_name = SessName.toString()
 
 
         val currentuser = auth.currentUser
@@ -499,75 +501,30 @@ class MainActivity2 : AppCompatActivity() {
     fun upload_bttn(){
 
 
-        try {
-            // Create a Workbook
-            val workbook = XSSFWorkbook()
+        val emptlst = mutableListOf<List<String>>()
 
-            // Create a Sheet
-            val sheet = workbook.createSheet("Attend3")
+        for (i in newarraylist){
 
-            // Create Header Row
-            val headerRow: Row = sheet.createRow(0)
-            val headers = listOf("Name", "Attendance")
-            for ((index, header) in headers.withIndex()) {
-                val cell: Cell = headerRow.createCell(index)
-                cell.setCellValue(header)
+
+            Log.i("jio",i.toString())
+            if (i.pres==1){
+
+                emptlst.add(listOf<String>(i.member_name.toString(),"Present"))
+
+            }
+            else{
+                emptlst.add(listOf<String>(i.member_name.toString(),"Absent"))
             }
 
 
 
-            val emptlst = mutableListOf<List<String>>()
 
-            for (i in newarraylist){
-
-
-                Log.i("jio",i.toString())
-                if (i.pres==1){
-
-                    emptlst.add(listOf<String>(i.member_name.toString(),"Present"))
-
-                }
-                else{
-                    emptlst.add(listOf<String>(i.member_name.toString(),"Absent"))
-                }
-
-
-
-
-            }
-
-            emptlst.toList()//To make the list work in the down forloop
-            Log.i("jwn",emptlst.toString())
-
-
-
-
-            for ((rowIndex, rowData) in emptlst.withIndex()) {
-                val row: Row = sheet.createRow(rowIndex + 1)
-                for ((cellIndex, cellData) in rowData.withIndex()) {
-                    val cell: Cell = row.createCell(cellIndex)
-                    cell.setCellValue(cellData)
-                }
-            }
-
-            // Create a File in External Storage
-            val fileName = "Attendance.xlsx"
-            val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
-
-            // Write the Workbook to File
-            val fileOutputStream = FileOutputStream(file)
-            workbook.write(fileOutputStream)
-
-            // Close Streams
-            fileOutputStream.close()
-            workbook.close()
-
-            println("Excel file created successfully at: ${file.absolutePath}")
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            println("Error creating Excel file: ${e.message}")
         }
+
+        emptlst.toList()//To make the list work in the down forloop
+        Log.i("jwn",emptlst.toString())
+
+        ExcelUtils.writeDataToExcel(currentDate,emptlst, "$sess_name")
     }
 
 
