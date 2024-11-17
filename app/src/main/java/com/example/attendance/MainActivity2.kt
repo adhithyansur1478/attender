@@ -524,7 +524,7 @@ class MainActivity2 : AppCompatActivity() {
         emptlst.toList()//To make the list work in the down forloop
         Log.i("jwn",emptlst.toString())
 
-        ExcelUtils.writeDataToExcel(currentDate,emptlst, "$sess_name")
+        ExcelUtils(this).writeDataToExcel(currentDate,emptlst, "$sess_name")
     }
 
 
