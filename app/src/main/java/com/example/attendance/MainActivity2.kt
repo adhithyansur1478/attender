@@ -158,6 +158,7 @@ class MainActivity2 : AppCompatActivity() {
 
 
 
+
             upload_bttn()
 
         }
@@ -507,6 +508,9 @@ class MainActivity2 : AppCompatActivity() {
     }
 
     fun upload_bttn(){
+
+
+
 
 
         progressbar()

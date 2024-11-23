@@ -1,12 +1,16 @@
 package com.example.attendance
 
 import android.app.Dialog
+import android.content.ContentValues
 import android.content.Context
+import android.net.Uri
 import android.os.Environment
 import android.os.storage.StorageManager
+import android.provider.MediaStore
 import android.util.Log
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.core.net.toUri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,6 +25,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStream
 
 class ExcelUtils(context: Context) {
 
@@ -41,9 +46,14 @@ class ExcelUtils(context: Context) {
             val fileIn =
                 FileInputStream("/storage/emulated/0/Download/$filename.xlsx") // Path to your existing file
 
-            progressBar.show()
+
+
 
             CoroutineScope(Dispatchers.IO).launch {
+
+                withContext(Dispatchers.Main) {
+                    progressBar.show()
+                }
 
                 try {
                     val workbook = XSSFWorkbook(fileIn) // This will load the workbook
@@ -112,6 +122,7 @@ class ExcelUtils(context: Context) {
             }
         } else {
             Log.i("ext", "nop")
+            progressBar.show()
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     // Create a Workbook
@@ -150,22 +161,38 @@ class ExcelUtils(context: Context) {
                         }
                     }
 
-                    // Create a File in External Storage
-                    val fileName = "$filename.xlsx"
-                    val file = File(
-                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                        fileName
-                    )
+                    // Create a ContentValues object to insert data into MediaStore
+                    val contentValues = ContentValues().apply {
+                        put(MediaStore.MediaColumns.DISPLAY_NAME, filename)  // File name
+                        put(MediaStore.MediaColumns.MIME_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                        put(MediaStore.MediaColumns.RELATIVE_PATH, "Download/")  // Store in Downloads directory
+                    }
 
-                    // Write the Workbook to File
-                    val fileOutputStream = FileOutputStream(file)
-                    workbook.write(fileOutputStream)
+                    // Insert file into MediaStore
+                    val uri: Uri? = cont.contentResolver.insert(MediaStore.Files.getContentUri("external"), contentValues)
+                    Log.i("ur1434",uri.toString())
+                    if (uri != null) {
+                        Log.i("ur143",uri.path.toString().toUri().toString())
+                    }
 
-                    // Close Streams
-                    fileOutputStream.close()
-                    workbook.close()
+                    // Open output stream to write to the file
+                    uri?.let { fileUri ->
+                        val outputStream: OutputStream? = cont.contentResolver.openOutputStream(fileUri)
+                        outputStream?.let { stream ->
+                            // Write workbook to output stream
+                            workbook.write(stream)
 
-                    println("Excel file created successfully at: ${file.absolutePath}")
+                            stream.close()
+                            workbook.close()
+
+                            withContext(Dispatchers.Main) {
+
+                                Toast.makeText(cont, "Excel file saved to Downloads.", Toast.LENGTH_LONG).show()
+                            }
+
+
+                        }
+                    }
 
                     // Dismiss the progress bar when the task is completed (on the main thread)
                     withContext(Dispatchers.Main) {
@@ -188,6 +215,8 @@ class ExcelUtils(context: Context) {
 
         }
     }
+
+
 
     }
 
