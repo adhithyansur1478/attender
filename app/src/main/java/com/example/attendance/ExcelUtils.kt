@@ -58,9 +58,15 @@ class ExcelUtils(context: Context) {
                 try {
                     val workbook = XSSFWorkbook(fileIn) // This will load the workbook
 
+                    //workbook.unLockStructure() // this will unlock the locked workbook and after unlocking only we will be able to edit
+
                     // Create a Sheet //regex is used to replace / in date with - bcuz excel doesnt support /?[]etc in sheetname
                     val sheet =
                         workbook.createSheet(sheetName.replace(Regex("[/\\\\?*\\[\\]]"), "-"))
+
+                    // Protect the sheet with a password which avoids editing the data in a sheet it only blocks editing throug app like excel programatically editing is still possible
+                    sheet.protectSheet("123321")
+
 
                     // Create Header Row
                     val headerRow: Row = sheet.createRow(0)
@@ -84,6 +90,8 @@ class ExcelUtils(context: Context) {
                         }
                     }
 
+                    workbook.lockStructure() //this locks the entire structure of workbbok we cant dlt rname or add any sheet both programatically and throuh app like excel
+
                     // Create a File in External Storage
                     val fileName = "$filename.xlsx"
                     val file = File(
@@ -97,6 +105,7 @@ class ExcelUtils(context: Context) {
 
                     // Close Streams
                     fileOutputStream.close()
+
                     workbook.close()
 
                     println("Excel file created successfully at: ${file.absolutePath}")
@@ -133,6 +142,7 @@ class ExcelUtils(context: Context) {
                     val sheet =
                         workbook.createSheet(sheetName.replace(Regex("[/\\\\?*\\[\\]]"), "-"))
 
+                    sheet.protectSheet("123321")
                     // Create Header Row
                     val headerRow: Row = sheet.createRow(0)
                     val headers = listOf("Name", "Attendance")
@@ -160,6 +170,7 @@ class ExcelUtils(context: Context) {
                             cell.setCellValue(cellData)
                         }
                     }
+                    workbook.lockStructure() //this locks the entire structure of workbbok we cant dlt rname or add any sheet both programatically and throuh app like excel
 
                     // Create a ContentValues object to insert data into MediaStore
                     val contentValues = ContentValues().apply {
@@ -213,6 +224,42 @@ class ExcelUtils(context: Context) {
                 }
             }
 
+        }
+    }
+
+    fun deleteSheetFromExcel(filePath: String, sheetName: String) {
+        try {
+            // Open the workbook from the file
+            val file = File("/storage/emulated/0/Download/$filePath.xlsx")
+            val fis = FileInputStream(file)
+            val workbook = XSSFWorkbook(fis)
+
+            // Get the sheet index by name
+            val sheetIndex = workbook.getSheetIndex(sheetName.replace(Regex("[/\\\\?*\\[\\]]"), "-"))//regex is used because here sheetname is stored in d-m-y not d/m/y bcuz it is not supported by excel
+            Log.i("jiji2",sheetName.toString())
+
+            // Check if the sheet exists
+            if (sheetIndex != -1) {
+                // Remove the sheet
+                workbook.removeSheetAt(sheetIndex)
+
+                // Write the changes back to the file
+                val fos = FileOutputStream(file)
+                workbook.write(fos)
+
+                // Close the streams
+                fos.close()
+                fis.close()
+
+                Toast.makeText(cont,"Sheet Deleted Successfully",Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(cont,"Sheet Not Found",Toast.LENGTH_SHORT).show()
+            }
+
+            workbook.close()
+
+        } catch (e: Exception) {
+            Toast.makeText(cont,e.message.toString(),Toast.LENGTH_SHORT).show()
         }
     }
 

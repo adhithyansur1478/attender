@@ -142,8 +142,9 @@ class MyAdapter2(private val context: Context, private val newarrayList: ArrayLi
 
         fun bind(member: Member) {
             itemView.findViewById<TextView>(R.id.mem_name).text =
-                "Member Name: ${member.member_name}"
-            itemView.findViewById<TextView>(R.id.mem_gender).text = "Gender: ${member.mem_gender}"
+                "Member Name : ${member.member_name}"
+            itemView.findViewById<TextView>(R.id.mem_gender).text = "Gender               : ${member.mem_gender}"
+            itemView.findViewById<TextView>(R.id.mem_phn).text = "Phn Number     : +91 ${member.mem_phn}"
             itemView.findViewById<CheckBox>(R.id.checkBox).isChecked = member.mem_chbx
             itemView.findViewById<CheckBox>(R.id.checkBox).isEnabled = !member.mem_chbx
             var radioButtonYes = itemView.findViewById<RadioButton>(R.id.rb_yes)

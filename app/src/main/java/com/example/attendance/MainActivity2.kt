@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.attendance.databinding.ActivityMain2Binding
 import com.example.attendance.databinding.ActivityMainBinding
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -156,15 +157,17 @@ class MainActivity2 : AppCompatActivity() {
         binding.uploadBttn.setOnClickListener {
 
 
-
-
-
-
             upload_bttn()
 
         }
 
 
+        binding.dltBttn.setOnClickListener {
+
+
+            ExcelUtils(this).deleteSheetFromExcel(sess_name,currentDate)
+
+        }
 
 
     }
@@ -181,11 +184,32 @@ class MainActivity2 : AppCompatActivity() {
         val rb3:RadioButton = dialogview.findViewById(R.id.other)
         val conf_bttn:Button = dialogview.findViewById(R.id.conf_bttn)
         val mem_name:TextView = dialogview.findViewById(R.id.memb_name_txt)
+        val mem_name_TIL:TextInputLayout = dialogview.findViewById(R.id.memb_name_TIL)
+        val mem_phn_TIL:TextInputLayout = dialogview.findViewById(R.id.memb_phn_TIL)
+        val mem_phn:TextView = dialogview.findViewById(R.id.memb_phn_txt)
 
-        conf_bttn.setOnClickListener {
 
+        fun valdate():Boolean{
 
-            val mem_name = mem_name.text.toString()
+            var error:Boolean = false
+            if (mem_name.text.isEmpty()){
+                mem_name_TIL.error = "Please Enter The Name"
+                error = true
+            }
+            else{
+                mem_name_TIL.error = null
+
+            }
+            if (mem_phn.text.isEmpty()||!mem_phn.text.matches(Regex("^[0-9]+\$"))||mem_phn.text.toString().length!=10){
+
+                mem_phn_TIL.error = "Please Enter A 10 digit Valid Phone  Number"
+                error = true
+            }
+            else{
+                mem_phn_TIL.error = null
+
+            }
+
 
             if (rb1.isChecked){
                 gender = rb1.text.toString()
@@ -198,20 +222,33 @@ class MainActivity2 : AppCompatActivity() {
                 gender = rb3.text.toString()
 
             }
+            else{
+                error = true
+            }
+            return error
+        }
 
-            upload_memdet(mem_name,gender,sid,dialog)
+
+        conf_bttn.setOnClickListener {
+
+
+
+            if (!valdate()) {
+
+                upload_memdet(mem_name.text.toString(), gender, sid, dialog, mem_phn.text.toString())
+            }
         }
 
 
     }
 
-    fun upload_memdet(nm:String,gn:String,sid:String,db:AlertDialog){
+    fun upload_memdet(nm:String,gn:String,sid:String,db:AlertDialog,ph:String){
 
         database = FirebaseDatabase.getInstance()
         dbreff = database.getReference("Users")
 
         var MemberId: String? = dbreff.push().key//creates a random key
-        var uploadd = Member(member_name =nm, mem_gender =gn , memid = MemberId.toString(),mem_chbx = false,up_date = currentDate, pres = 0)
+        var uploadd = Member(member_name =nm, mem_gender =gn , memid = MemberId.toString(),mem_chbx = false,up_date = currentDate, pres = 0, mem_phn = ph)
         dbreff.child(uid).child("Members").child(sid).child(MemberId.toString()).setValue(uploadd).addOnCompleteListener {
 
 
@@ -265,11 +302,12 @@ class MainActivity2 : AppCompatActivity() {
                     val mem_gender = i.child("mem_gender").value.toString()
                     val mem_id = i.child("memid").value.toString()
                     val mem_chbx = i.child("mem_chbx").value.toString().toBoolean()
+                    val mem_phn = i.child("mem_phn").value.toString()
                     update = i.child("up_date").value.toString()
                     val pres  = i.child("pres").value.toString().toInt()
 
 
-                    val up = Member(member_name = mem_name, mem_gender = mem_gender,memid = mem_id,mem_chbx=mem_chbx,up_date = update, pres = pres )
+                    val up = Member(member_name = mem_name, mem_gender = mem_gender,memid = mem_id,mem_chbx=mem_chbx,up_date = update, pres = pres,mem_phn = mem_phn)
                     newarraylist.add(0,up) //adding 0 to get the latest added data first in recyclerview it adds to the last of list
 
 
