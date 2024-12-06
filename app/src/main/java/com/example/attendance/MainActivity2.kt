@@ -276,7 +276,7 @@ class MainActivity2 : AppCompatActivity() {
                     Log.i("hui", i.child("up_date").value.toString())
 
                 }
-                Log.i("hkk", newarraylist[0].member_name.toString())//testing
+                //Log.i("hkk", newarraylist[0].member_name.toString())//testing
 
                 if (newarraylist.isNotEmpty()) {
                     var i = 1
