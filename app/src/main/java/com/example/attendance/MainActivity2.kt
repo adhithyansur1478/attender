@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
+import android.os.Parcelable
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -250,7 +251,9 @@ class MainActivity2 : AppCompatActivity() {
 
     fun getData(session_id:String) {//gets the url of image from database
 
+        val layoutManager = recyclerView.layoutManager as LinearLayoutManager
 
+        val scrollPosition = layoutManager.findFirstVisibleItemPosition()
 
         dbreff.child("$uid").child("Members").child(session_id).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) { //updates the array list after change in database
@@ -326,10 +329,22 @@ class MainActivity2 : AppCompatActivity() {
                 binding.membercountTv.text = "Total Number Of Members: $mem_count"
 
                 try {
+
+                    //val verticalScrollOffset = recyclerView.computeVerticalScrollOffset()//used to get the current position of the recyclerview
+                    // Save state
+                    var recyclerViewState: Parcelable? = recyclerView.getLayoutManager()?.onSaveInstanceState()
+                    //Restore state
+                    recyclerView.getLayoutManager()?.onRestoreInstanceState(recyclerViewState)
+
                     myAdapter = MyAdapter2(this@MainActivity2, newarraylist)
                     recyclerView.adapter = myAdapter
+
                     myAdapter.notifyDataSetChanged()
-                    initrecycler()
+
+
+                    //initrecycler()
+
+
 
                 }
                 catch (e:Exception){
